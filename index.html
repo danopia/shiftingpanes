@@ -7,13 +7,13 @@
     body { margin: 0; padding: 0; }
     
     #paneview {
-      width: 100%;
       height: 100%;
       background-color: #eee;
     }
     
     .pane {
       background-color: #eee;
+      border-left: 1px solid #ccc;
     }
     
     .nav.pane ul {
@@ -43,6 +43,8 @@
   
   <script type="text/javascript">
     $(function () {
+      $('#paneview').css({width: $('body').width()-1});
+      
       var pv = new $.PaneView('#paneview');
       
       var callback = function (e) { pv.popPane(); e.preventDefault(); };
