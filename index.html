@@ -12,6 +12,7 @@
     
     .pane {
       border: 1px solid red;
+      background: #ddd;
     }
   </style>
   
@@ -22,39 +23,21 @@
     $(function () {
       var pv = new $.PaneView('#paneview');
       
-      var home = pv.pushPane('Home');
-      home.text('Courses');
+      var callback = function (e) { pv.popPane(); e.preventDefault(); };
+      var recent = new $.PaneView.NavPane('Recent');
+      for (var i = 1; i <= 50; i++) {
+        recent.add('Item ' + i, callback);
+      };
       
-      setTimeout(function () {
-        var course = pv.pushPane('Math');
-        course.text('Math');
-      }, 1000);
-      
-      setTimeout(function () {
-        var hw = pv.pushPane('Homework');
-        hw.text('Page 340');
-      }, 2000);
-      
-      setTimeout(function () {
-        pv.popPane();
-      }, 3000);
-      
-      setTimeout(function () {
-        var hw = pv.pushPane('Homework');
-        hw.text('Page 340');
-      }, 4000);
-      
-      setTimeout(function () {
-        pv.popPane();
-      }, 5000);
-      
-      setTimeout(function () {
-        pv.popPane();
-      }, 6000);
-      
-      setTimeout(function () {
-        pv.popPane();
-      }, 7000);
+      callback = function (e) { pv.pushPane(recent); e.preventDefault(); };
+      var home = new $.PaneView.NavPane('Main Menu');
+      home.add('Recent', callback);
+      home.add('Services', callback);
+      home.add('Inventory', callback);
+      home.add('Reporting', callback);
+      home.add('Clients', callback);
+      home.add('Search', callback);
+      pv.pushPane(home);
     });
   </script>
 </head>
