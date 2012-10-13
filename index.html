@@ -1,0 +1,68 @@
+<html>
+<head>
+  <title>ShiftingPanes Demo</title>
+  
+  <!--link href="style.css" rel="stylesheet" type="text/css"-->
+  <style type="text/css">
+    #paneview {
+      border: 1px solid black;
+      width: 800px;
+      height: 600px;
+    }
+    
+    .pane {
+      border: 1px solid red;
+    }
+  </style>
+  
+  <script type="text/javascript" src="jquery.js"></script>
+  <script type="text/javascript" src="panes.js"></script>
+  
+  <script type="text/javascript">
+    $(function () {
+      var pv = new $.PaneView('#paneview');
+      
+      var home = pv.pushPane('Home');
+      home.text('Courses');
+      
+      setTimeout(function () {
+        var course = pv.pushPane('Math');
+        course.text('Math');
+      }, 1000);
+      
+      setTimeout(function () {
+        var hw = pv.pushPane('Homework');
+        hw.text('Page 340');
+      }, 2000);
+      
+      setTimeout(function () {
+        pv.popPane();
+      }, 3000);
+      
+      setTimeout(function () {
+        var hw = pv.pushPane('Homework');
+        hw.text('Page 340');
+      }, 4000);
+      
+      setTimeout(function () {
+        pv.popPane();
+      }, 5000);
+      
+      setTimeout(function () {
+        pv.popPane();
+      }, 6000);
+      
+      setTimeout(function () {
+        pv.popPane();
+      }, 7000);
+    });
+  </script>
+</head>
+<body>
+
+  <section id="paneview">
+  </section>
+
+</body>
+</html>
+
