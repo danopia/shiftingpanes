@@ -48,6 +48,12 @@
       var pv = new $.PaneView('#paneview');
       
       var callback = function (e) { pv.popPane(); e.preventDefault(); };
+      var details = new $.PaneView.NavPane('Item');
+      for (var i = 1; i <= 20; i++) {
+        details.add('Field ' + i, callback);
+      };
+      
+      callback = function (e) { pv.pushPane(details); e.preventDefault(); };
       var recent = new $.PaneView.NavPane('Recent');
       for (var i = 1; i <= 50; i++) {
         recent.add('Item ' + i, callback);
