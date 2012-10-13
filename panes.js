@@ -16,7 +16,7 @@ $.PaneView.prototype.pushPane = function (pane) {
     this.last(1).$dom.animate({left: 0,   right: 0});
   } else if (this.stack.length >= 2) {
     this.last(1).$dom.animate({left: '20%', right: 0});
-    this.last(2).$dom.animate({left: 0,   right: '80%'});
+    this.last(2).$dom.animate({left: 0,   right: 0});
   };
   
   return pane;
