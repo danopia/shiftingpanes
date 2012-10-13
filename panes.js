@@ -61,7 +61,7 @@ $.PaneView.NavPane = function (title) {
   this.$title = $('<h3/>', {text: title}).appendTo(this.$dom);
   
   this.$inner = $('<div/>').appendTo(this.$dom);
-  this.$inner.css({width: 600, 'overflow-x': 'hidden'});
+  //this.$inner.css({width: 600, 'overflow-x': 'hidden'});
   
   this.$ul = $('<ul/>').appendTo(this.$inner);
 };
