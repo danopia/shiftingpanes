@@ -50,20 +50,20 @@
       var leaf = new $.PaneView.Pane('Field');
       leaf.text('Leaf pane, coming through!');
       
-      var callback = function (e) { pv.pushPane(leaf); e.preventDefault(); };
       var details = new $.PaneView.NavPane('Item');
+      var callback = function (e) { pv.pushPaneAfter(leaf, details); e.preventDefault(); };
       for (var i = 1; i <= 20; i++) {
         details.add('Field ' + i, callback);
       };
       
-      callback = function (e) { pv.pushPane(details); e.preventDefault(); };
       var recent = new $.PaneView.NavPane('Recent');
+      callback     = function (e) { pv.pushPaneAfter(details, recent); e.preventDefault(); };
       for (var i = 1; i <= 50; i++) {
         recent.add('Item ' + i, callback);
       };
       
-      callback = function (e) { pv.pushPane(recent); e.preventDefault(); };
       var home = new $.PaneView.NavPane('Main Menu');
+      callback     = function (e) { pv.pushPaneAfter(recent, home); e.preventDefault(); };
       home.add('Recent', callback);
       home.add('Services', callback);
       home.add('Inventory', callback);
