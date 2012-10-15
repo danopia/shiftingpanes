@@ -47,7 +47,10 @@
       
       var pv = new $.PaneView('#paneview');
       
-      var callback = function (e) { pv.popPane(); e.preventDefault(); };
+      var leaf = new $.PaneView.Pane('Field');
+      leaf.text('Leaf pane, coming through!');
+      
+      var callback = function (e) { pv.pushPane(leaf); e.preventDefault(); };
       var details = new $.PaneView.NavPane('Item');
       for (var i = 1; i <= 20; i++) {
         details.add('Field ' + i, callback);
