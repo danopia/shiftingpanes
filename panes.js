@@ -8,6 +8,19 @@ $.PaneView.prototype.last = function (offset) {
   return this.stack[this.stack.length - offset];
 };
 
+$.PaneView.prototype.pushPaneAfter = function (pane, parent) {
+  while (this.stack.length && this.last(1) != parent && this.last(2) != parent) {
+    this.popPane();
+  };
+  
+  if (this.last(1) != parent) {
+    this.last(1).$dom.animate({left: '100%', right: 0}); // TODO: and remove from DOM
+    this.stack.pop();
+  };
+  
+  this.pushPane(pane);
+};
+
 $.PaneView.prototype.pushPane = function (pane) {
   this.$dom.append(pane.$dom);
   this.stack.push(pane);
