@@ -1,0 +1,169 @@
+<html>
+<head>
+  <title>A Better TMS</title>
+  
+  <!--link href="style.css" rel="stylesheet" type="text/css"-->
+  <style type="text/css">
+    body { margin: 0; padding: 0; }
+    
+    #paneview {
+      height: 100%;
+      background-color: #eee;
+    }
+    
+    .pane {
+      background-color: #eee;
+      border-left: 1px solid #ccc;
+    }
+    
+    .nav.pane ul {
+      padding: 0;
+    }
+    .nav.pane li {
+      list-style: none;
+    }
+    .nav.pane a {
+      display: block;
+      padding: 1em;
+      background-color: #fff;
+      border: solid #ccc;
+      border-width: 1px 0;
+      margin-top: -1px;
+      color: #000;
+      text-decoration: none;
+      font-size: 120%;
+      
+      transition-property: background;
+      transition-duration: 0.5s;
+    }
+    .nav.pane a:hover {
+      background-color: #eef;
+    }
+    .nav.pane a.active {
+      background-color: #dde;
+    }
+    .nav.pane a.active:after {
+      content: '>';
+      float: right;
+    }
+  </style>
+  
+  <script type="text/javascript" src="jquery.js"></script>
+  <script type="text/javascript" src="panes.js"></script>
+  
+  <script type="text/javascript">
+    $(function () {
+      $('#paneview').css({width: $('body').width()-1});
+      
+      $.pv = new $.PaneView('#paneview');
+      
+      $.pv.route(/^\/terms\/(\d+)$/, function (path, params) {
+        var menu = new $.PaneView.NavPane($.terms[params[1]]);
+        menu.add('By college', path + '/colleges');
+        menu.add('By subject', path + '/subjects');
+        menu.add('By building', path + '/buildings');
+        menu.add('By course', path + '/courses');
+        return menu;
+      });
+      
+      $.pv.route(/^\/terms\/(\d+)\/courses$/, function (path, params) {
+        var pane = new $.PaneView.NavPane($.terms[params[1]] + ' Courses');
+        
+        $.getJSON('http://abettertms.com/api/courses', function (data) {
+          $.each(data.courses.course, function (i, course) {
+            pane.add(course.subjectcode + '-' + course.coursenumber + ' ' + course.coursetitle, path + '/' + course.coursecode + '/sections');
+          });
+        });
+          
+        return pane;
+      });
+      
+      $.pv.route(/^\/terms\/(\d+)\/subjects$/, function (path, params) {
+        var pane = new $.PaneView.NavPane($.terms[params[1]] + ' Subjects');
+        
+        $.each($.subjects, function (scode, sname) {
+          pane.add(scode + ' ' + sname, path + '/' + scode + '/courses');
+        });
+          
+        return pane;
+      });
+      
+      $.pv.route(/^\/terms\/(\d+)\/subjects\/([A-Z]+)\/courses$/, function (path, params) {
+        var pane = new $.PaneView.NavPane($.terms[params[1]] + ' ' + params[2] + ' Courses');
+        
+        $.getJSON('http://abettertms.com/api/courses?subjectcode=' + params[2], function (data) {
+          $.each(data.courses.course, function (i, course) {
+            pane.add(course.subjectcode + '-' + course.coursenumber + ' ' + course.coursetitle, path + '/' + course.coursecode + '/sections');
+          });
+        });
+          
+        return pane;
+      });
+      
+      
+      $.pv.route(/\/courses\/(\d+)\/sections$/, function (path, params) {
+        var pane = new $.PaneView.NavPane('Course ' + params[1]);
+        
+        $.getJSON('http://abettertms.com/api/sections?coursecode=' + params[1], function (data) {
+          $.each(data.sections.section, function (i, section) {
+            pane.add(section.sec, path + '/' + section.crn);
+          });
+        });
+          
+        return pane;
+      });
+      
+      
+      $.pv.route(/\/sections\/(\d+)$/, function (path, params) {
+        var pane = new $.PaneView.Pane('CRN ' + params[1]);
+        
+        $.getJSON('http://abettertms.com/api/classes?crn=' + params[1], function (data) {
+          pane.text(data.classes['class'][0].time);
+        });
+          
+        return pane;
+      });
+      
+      
+      $.pv.route(/^\/([^\/]+)\/items\/(\d+)\/fields\/(\d+)$/, function (path, params) {
+        var leaf = new $.PaneView.Pane(params[1] + ' item ' + params[2] + ' field ' + params[3]);
+        leaf.text('Leaf pane, coming through!');
+        return leaf;
+      });
+      
+      $.termpane = new $.PaneView.NavPane('Terms');
+      $.termpane.path = '/';
+      $.pv.pushPane($.termpane);
+      
+      $.colleges = {};
+      $.getJSON('http://abettertms.com/api/colleges', function (data) {
+        $.each(data.colleges.college, function (i, college) {
+          $.colleges[college.collegecode] = college.collegename;
+        });
+
+        $.subjects = {};
+        $.getJSON('http://abettertms.com/api/subjects', function (data) {
+          $.each(data.subjects.subject, function (i, subject) {
+            $.subjects[subject.subjectcode] = subject.subjectname;
+          });
+        });
+      });
+      
+      $.terms = {}
+      $.getJSON('http://abettertms.com/api/terms', function (data) {
+        $.each(data.terms.term, function (i, term) {
+          $.terms[term.termcode] = term.termname;
+          $.termpane.add(term.termname, '/terms/' + term.termcode);
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+
+  <section id="paneview">
+  </section>
+
+</body>
+</html>
+

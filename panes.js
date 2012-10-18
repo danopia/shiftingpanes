@@ -60,7 +60,7 @@ $.PaneView.prototype.pushPane = function (pane, swap) {
   this.$dom.append(pane.$dom);
   this.stack.push(pane);
   pane.paneview = this;
-  window.history.pushState({stack: $.map(this.stack,function(p){return p.path}), path: pane.path}, 'shifting pane', pane.path);
+  //window.history.pushState({stack: $.map(this.stack,function(p){return p.path}), path: pane.path}, 'shifting pane', pane.path);
   
   if (this.stack.length == 1) {
     this.last(1).$dom.animate({left: 0,   right: 0});
@@ -85,8 +85,8 @@ $.PaneView.prototype.popPane = function () {
   
   this.stack.pop();
   
-  if (this.last(1))
-    window.history.pushState({}, 'shifting pane', this.last(1).path);
+  //if (this.last(1))
+    //window.history.pushState({}, 'shifting pane', this.last(1).path);
 };
 
 
