@@ -2,17 +2,37 @@ $.PaneView = function (selector) {
   this.$dom = $($(selector)[0]);
   this.$dom.css({position: 'relative', 'overflow-x': 'visible'});
   this.stack = [];
-  this.routes = {};
+  this.routes = [];
+};
+
+$.PaneView.prototype.route = function (path, handler) {
+  var route = {handler: handler};
+  
+  if (typeof(path) == 'string') {
+    route.path = path;
+  } else if (path.exec) {
+    route.regex = path;
+  } else {
+    console.log('WARNING: no idea how to handle routes with', path);
+  };
+  
+  this.routes.push(route);
 };
 
 $.PaneView.prototype.makePane = function (path) {
-  if (this.routes[path]) {
-    return this.routes[path]();
-  } else {
-    var leaf = new $.PaneView.Pane('Error');
-    leaf.text("404 Not Found error for " + path);
-    return leaf;
+  var i, param, route;
+  
+  for (i = 0; i < this.routes.length; i++) {
+    route = this.routes[i];
+    if (route.path == path)
+      return route.handler(path);
+    else if (route.regex && (param = route.regex.exec(path)))
+      return route.handler(path, param);
   };
+  
+  var leaf = new $.PaneView.Pane('Error');
+  leaf.text('404 Not Found error for ' + path);
+  return leaf;
 };
 
 $.PaneView.prototype.last = function (offset) {
@@ -92,11 +112,12 @@ $.PaneView.NavPane = function (title) {
   
   var self = this;
   this.$ul.on('click', 'a', function (e) {
+    e.preventDefault();
+    
     if (self.current == e.target) {
       self.paneview.popPane();
       self.current = null;
       $(e.target).removeClass('active');
-      e.preventDefault();
       return;
     }
     
@@ -111,7 +132,6 @@ $.PaneView.NavPane = function (title) {
     
     self.current = e.target;
     $(e.target).addClass('active');
-    e.preventDefault();
   });
 };
 

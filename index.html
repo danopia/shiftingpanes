@@ -50,29 +50,27 @@
       
       var pv = new $.PaneView('#paneview');
       
-      pv.routes['/recent']    = pv.routes['/services'] = pv.routes['/inventory'] =
-      pv.routes['/reporting'] = pv.routes['/clients']  = pv.routes['/search'] =
-      function () {
-        var recent = new $.PaneView.NavPane('Recent');
+      pv.route(/^\/(recent|services|inventory|reporting|clients|search)$/, function (path, params) {
+        var recent = new $.PaneView.NavPane(params[1]);
         for (var i = 1; i <= 50; i++) {
-          recent.add('Item ' + i, '/item');
+          recent.add('Item ' + i, path + '/items/' + i);
         };
         return recent;
-      };
+      });
       
-      pv.routes['/item'] = function () {
-        var details = new $.PaneView.NavPane('Item');
+      pv.route(/^\/([^\/]+)\/items\/(\d+)$/, function (path, params) {
+        var details = new $.PaneView.NavPane(params[1] + ' item ' + params[2]);
         for (var i = 1; i <= 20; i++) {
-          details.add('Field ' + i, '/item/field');
+          details.add('Field ' + i, path + '/fields/' + i);
         };
         return details;
-      };
+      });
       
-      pv.routes['/item/field'] = function () {
-        var leaf = new $.PaneView.Pane('Field');
+      pv.route(/^\/([^\/]+)\/items\/(\d+)\/fields\/(\d+)$/, function (path, params) {
+        var leaf = new $.PaneView.Pane(params[1] + ' item ' + params[2] + ' field ' + params[3]);
         leaf.text('Leaf pane, coming through!');
         return leaf;
-      };
+      });
       
       var home = new $.PaneView.NavPane('Main Menu');
       home.add('Recent', '/recent');
