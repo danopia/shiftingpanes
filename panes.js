@@ -53,10 +53,10 @@ $.PaneView.prototype.pushPaneAfter = function (pane, parent) {
     this.stack.pop();
   };
   
-  this.pushPane(pane);
+  this.pushPane(pane, true);
 };
 
-$.PaneView.prototype.pushPane = function (pane) {
+$.PaneView.prototype.pushPane = function (pane, swap) {
   this.$dom.append(pane.$dom);
   this.stack.push(pane);
   pane.paneview = this;
@@ -66,7 +66,7 @@ $.PaneView.prototype.pushPane = function (pane) {
     this.last(1).$dom.animate({left: 0,   right: 0});
   } else if (this.stack.length >= 2) {
     this.last(1).$dom.animate({left: '20%', right: 0});
-    this.last(2).$dom.animate({left: 0,   right: 0});
+    if (!swap) this.last(2).$dom.animate({left: 0,   right: '80%'});
   };
   
   return pane;

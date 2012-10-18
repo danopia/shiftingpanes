@@ -32,12 +32,19 @@
       color: #000;
       text-decoration: none;
       font-size: 120%;
+      
+      transition-property: background;
+      transition-duration: 0.5s;
     }
     .nav.pane a:hover {
       background-color: #eef;
     }
     .nav.pane a.active {
       background-color: #dde;
+    }
+    .nav.pane a.active:after {
+      content: '>';
+      float: right;
     }
   </style>
   
