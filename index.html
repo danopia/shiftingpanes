@@ -50,33 +50,31 @@
       
       var pv = new $.PaneView('#paneview');
       
-      var home = new $.PaneView.NavPane('Main Menu');
-      var hcallback = function (e) {
-      
+      pv.routes['/recent']    = pv.routes['/services'] = pv.routes['/inventory'] =
+      pv.routes['/reporting'] = pv.routes['/clients']  = pv.routes['/search'] =
+      function () {
         var recent = new $.PaneView.NavPane('Recent');
-        var rcallback = function (e) {
-        
-          var details = new $.PaneView.NavPane('Item');
-          var dcallback = function (e) { 
-            var leaf = new $.PaneView.Pane('Field');
-            leaf.text('Leaf pane, coming through!');
-            pv.pushPaneAfter(leaf, details);
-            e.preventDefault();
-          };
-          for (var i = 1; i <= 20; i++) {
-            details.add('Field ' + i, dcallback);
-          };
-          
-          pv.pushPaneAfter(details, recent);
-          e.preventDefault();
-        };
         for (var i = 1; i <= 50; i++) {
-          recent.add('Item ' + i, rcallback);
+          recent.add('Item ' + i, '/item');
         };
-        
-        pv.pushPaneAfter(recent, home);
-        e.preventDefault();
+        return recent;
       };
+      
+      pv.routes['/item'] = function () {
+        var details = new $.PaneView.NavPane('Item');
+        for (var i = 1; i <= 20; i++) {
+          details.add('Field ' + i, '/item/field');
+        };
+        return details;
+      };
+      
+      pv.routes['/item/field'] = function () {
+        var leaf = new $.PaneView.Pane('Field');
+        leaf.text('Leaf pane, coming through!');
+        return leaf;
+      };
+      
+      var home = new $.PaneView.NavPane('Main Menu');
       home.add('Recent', '/recent');
       home.add('Services', '/services');
       home.add('Inventory', '/inventory');

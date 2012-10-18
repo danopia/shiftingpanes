@@ -2,6 +2,17 @@ $.PaneView = function (selector) {
   this.$dom = $($(selector)[0]);
   this.$dom.css({position: 'relative', 'overflow-x': 'visible'});
   this.stack = [];
+  this.routes = {};
+};
+
+$.PaneView.prototype.makePane = function (path) {
+  if (this.routes[path]) {
+    return this.routes[path]();
+  } else {
+    var leaf = new $.PaneView.Pane('Error');
+    leaf.text("404 Not Found error for " + path);
+    return leaf;
+  };
 };
 
 $.PaneView.prototype.last = function (offset) {
@@ -89,8 +100,7 @@ $.PaneView.NavPane = function (title) {
       return;
     }
     
-    var leaf = new $.PaneView.Pane('Field');
-    leaf.text('Leaf pane, coming through!');
+    var leaf = self.paneview.makePane($(e.target).attr('href'));
     
     if (self.current) {
       $(self.current).removeClass('active');
