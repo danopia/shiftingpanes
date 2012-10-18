@@ -24,6 +24,7 @@ $.PaneView.prototype.pushPaneAfter = function (pane, parent) {
 $.PaneView.prototype.pushPane = function (pane) {
   this.$dom.append(pane.$dom);
   this.stack.push(pane);
+  pane.paneview = this;
   
   if (this.stack.length == 1) {
     this.last(1).$dom.animate({left: 0,   right: 0});
@@ -58,7 +59,7 @@ $.PaneView.Pane = function (title) {
   this.$title = $('<h3/>', {text: title}).appendTo(this.$dom);
   
   this.$inner = $('<div/>').appendTo(this.$dom);
-  this.$inner.css({width: 600, 'overflow-x': 'hidden'});
+  //this.$inner.css({width: 600, 'overflow-x': 'hidden'});
 };
 
 $.PaneView.Pane.prototype.text = function (text) {
@@ -77,13 +78,35 @@ $.PaneView.NavPane = function (title) {
   //this.$inner.css({width: 600, 'overflow-x': 'hidden'});
   
   this.$ul = $('<ul/>').appendTo(this.$inner);
+  
+  var self = this;
+  this.$ul.on('click', 'a', function (e) {
+    if (self.current == e.target) {
+      self.paneview.popPane();
+      self.current = null;
+      $(e.target).removeClass('active');
+      e.preventDefault();
+      return;
+    }
+    
+    var leaf = new $.PaneView.Pane('Field');
+    leaf.text('Leaf pane, coming through!');
+    
+    if (self.current) {
+      $(self.current).removeClass('active');
+      self.paneview.pushPaneAfter(leaf, self);
+    } else {
+      self.paneview.pushPane(leaf);
+    };
+    
+    self.current = e.target;
+    $(e.target).addClass('active');
+    e.preventDefault();
+  });
 };
 
-$.PaneView.NavPane.prototype.add = function (item, handler) {
-  var $a = $('<a/>', {text: item, href: '#'});
-  $a.on('click', handler);
-  
-  var $li = $('<li/>').append($a);
-  $li.appendTo(this.$ul);
+$.PaneView.NavPane.prototype.add = function (item, target) {
+  var $a  = $('<a/>', {text: item, href: target});
+  var $li = $('<li/>').append($a).appendTo(this.$ul);
 };
 

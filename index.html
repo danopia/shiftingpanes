@@ -36,6 +36,9 @@
     .nav.pane a:hover {
       background-color: #eef;
     }
+    .nav.pane a.active {
+      background-color: #dde;
+    }
   </style>
   
   <script type="text/javascript" src="jquery.js"></script>
@@ -47,29 +50,39 @@
       
       var pv = new $.PaneView('#paneview');
       
-      var leaf = new $.PaneView.Pane('Field');
-      leaf.text('Leaf pane, coming through!');
-      
-      var details = new $.PaneView.NavPane('Item');
-      var callback = function (e) { pv.pushPaneAfter(leaf, details); e.preventDefault(); };
-      for (var i = 1; i <= 20; i++) {
-        details.add('Field ' + i, callback);
-      };
-      
-      var recent = new $.PaneView.NavPane('Recent');
-      callback     = function (e) { pv.pushPaneAfter(details, recent); e.preventDefault(); };
-      for (var i = 1; i <= 50; i++) {
-        recent.add('Item ' + i, callback);
-      };
-      
       var home = new $.PaneView.NavPane('Main Menu');
-      callback     = function (e) { pv.pushPaneAfter(recent, home); e.preventDefault(); };
-      home.add('Recent', callback);
-      home.add('Services', callback);
-      home.add('Inventory', callback);
-      home.add('Reporting', callback);
-      home.add('Clients', callback);
-      home.add('Search', callback);
+      var hcallback = function (e) {
+      
+        var recent = new $.PaneView.NavPane('Recent');
+        var rcallback = function (e) {
+        
+          var details = new $.PaneView.NavPane('Item');
+          var dcallback = function (e) { 
+            var leaf = new $.PaneView.Pane('Field');
+            leaf.text('Leaf pane, coming through!');
+            pv.pushPaneAfter(leaf, details);
+            e.preventDefault();
+          };
+          for (var i = 1; i <= 20; i++) {
+            details.add('Field ' + i, dcallback);
+          };
+          
+          pv.pushPaneAfter(details, recent);
+          e.preventDefault();
+        };
+        for (var i = 1; i <= 50; i++) {
+          recent.add('Item ' + i, rcallback);
+        };
+        
+        pv.pushPaneAfter(recent, home);
+        e.preventDefault();
+      };
+      home.add('Recent', '/recent');
+      home.add('Services', '/services');
+      home.add('Inventory', '/inventory');
+      home.add('Reporting', '/reporting');
+      home.add('Clients', '/clients');
+      home.add('Search', '/search');
       pv.pushPane(home);
     });
   </script>
