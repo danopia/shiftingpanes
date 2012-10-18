@@ -3,6 +3,10 @@ $.PaneView = function (selector) {
   this.$dom.css({position: 'relative', 'overflow-x': 'visible'});
   this.stack = [];
   this.routes = [];
+  
+  $(window).bind('popstate', function (e) { // e.data
+    console.log(e.originalEvent.state);
+  });
 };
 
 $.PaneView.prototype.route = function (path, handler) {
@@ -55,6 +59,7 @@ $.PaneView.prototype.pushPaneAfter = function (pane, parent) {
 $.PaneView.prototype.pushPane = function (pane) {
   this.$dom.append(pane.$dom);
   this.stack.push(pane);
+  window.history.pushState({'a':'d'}, 'shifting pane', pane.path);
   pane.paneview = this;
   
   if (this.stack.length == 1) {
@@ -79,6 +84,9 @@ $.PaneView.prototype.popPane = function () {
   };
   
   this.stack.pop();
+  
+  if (this.last(1))
+    window.history.pushState({}, 'shifting pane', this.last(1).path);
 };
 
 
@@ -122,6 +130,7 @@ $.PaneView.NavPane = function (title) {
     }
     
     var leaf = self.paneview.makePane($(e.target).attr('href'));
+    leaf.path = $(e.target).attr('href');
     
     if (self.current) {
       $(self.current).removeClass('active');
