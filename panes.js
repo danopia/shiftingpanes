@@ -59,8 +59,8 @@ $.PaneView.prototype.pushPaneAfter = function (pane, parent) {
 $.PaneView.prototype.pushPane = function (pane) {
   this.$dom.append(pane.$dom);
   this.stack.push(pane);
-  window.history.pushState({'a':'d'}, 'shifting pane', pane.path);
   pane.paneview = this;
+  window.history.pushState({stack: $.map(this.stack,function(p){return p.path}), path: pane.path}, 'shifting pane', pane.path);
   
   if (this.stack.length == 1) {
     this.last(1).$dom.animate({left: 0,   right: 0});
