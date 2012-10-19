@@ -20,12 +20,12 @@
       padding: 0;
     }
     .nav.pane li {
+      background-color: #fff;
       list-style: none;
     }
     .nav.pane a {
       display: block;
       padding: 1em;
-      background-color: #fff;
       border: solid #ccc;
       border-width: 1px 0;
       margin-top: -1px;
@@ -46,6 +46,9 @@
       content: '>';
       float: right;
     }
+    
+    .closed a { background: rgba(255,   0, 0, 0.2); }
+    .open   a { background: rgba(  0, 255, 0, 0.2); }
   </style>
   
   <script type="text/javascript" src="jquery.js"></script>
@@ -101,12 +104,21 @@
       });
       
       
-      $.pv.route(/\/courses\/(\d+)\/sections$/, function (path, params) {
-        var pane = new $.PaneView.NavPane('Course ' + params[1]);
+      $.pv.route(/^\/terms\/(\d+)\/.+courses\/(\d+)\/sections$/, function (path, params) {
+        var pane = new $.PaneView.NavPane('Course ' + params[2]);
         
-        $.getJSON('http://abettertms.com/api/sections?coursecode=' + params[1], function (data) {
+        $.getJSON('http://abettertms.com/api/sections?coursecode=' + params[2], function (data) {
+          var waiting = data.sections.section.length;
           $.each(data.sections.section, function (i, section) {
-            pane.add(section.sec, path + '/' + section.crn);
+            $.getJSON('http://abettertms.com/api/classes?crn=' + section.crn, function (data2) {
+              var item = data2.classes['class'][0];
+              if (item.termname != $.terms[params[1]]) {
+                if (--waiting == 0) $.pv.popPane();
+                return;
+              } else {
+                pane.add(section.sec + ' ' + item.days + ' ' + item.time + ' (' + item.instructiontypename + ')', path + '/' + section.crn, (item.enroll == item.maxenroll) ? 'closed' : 'open');
+              };
+            });
           });
         });
           
@@ -118,18 +130,29 @@
         var pane = new $.PaneView.Pane('CRN ' + params[1]);
         
         $.getJSON('http://abettertms.com/api/classes?crn=' + params[1], function (data) {
-          pane.text(data.classes['class'][0].time);
+          var item = data.classes['class'][0];
+          var $dom = $('<div/\>').addClass('class');
+          
+          pane.title(item.subjectname + ' ' + item.coursenumber + '-' + item.sec + ': ' + item.coursetitle);
+          $dom.append($('<p/\>', {text: item.credits + ' credits'}));
+          $dom.append($('<p/\>', {text: 'CRN: ' + item.crn}));
+          $dom.append($('<p/\>', {text: 'Instructor: ' + item.instructorname}));
+          $dom.append($('<p/\>', {text: 'Dates: ' + item.startdate + ' through ' + item.enddate}));
+          $dom.append($('<p/\>', {text: 'Time: ' + item.days + ' ' + item.time}));
+          $dom.append($('<p/\>', {text: 'Location: ' + item.buildingname + ' ' + item.room + ' (' + item.campusname + ')'}));
+          $dom.append($('<p/\>', {text: 'Enrollment: ' + item.enroll + ' of ' + item.maxenroll}));
+          $dom.append($('<p/\>', {text: 'Instruction type: ' + item.instructiontypename}));
+          $dom.append($('<p/\>', {text: 'Term: ' + item.termname}));
+          $dom.append($('<p/\>', {text: 'College: ' + item.collegename}));
+          $dom.append($('<p/\>', {text: 'Comments: ' + item.comments}));
+          $dom.append($('<p/\>', {html: item.description.split('\r\n').join('<br/>')}));
+          
+          pane.dom($dom);
         });
           
         return pane;
       });
       
-      
-      $.pv.route(/^\/([^\/]+)\/items\/(\d+)\/fields\/(\d+)$/, function (path, params) {
-        var leaf = new $.PaneView.Pane(params[1] + ' item ' + params[2] + ' field ' + params[3]);
-        leaf.text('Leaf pane, coming through!');
-        return leaf;
-      });
       
       $.termpane = new $.PaneView.NavPane('Terms');
       $.termpane.path = '/';

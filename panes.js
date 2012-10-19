@@ -94,15 +94,22 @@ $.PaneView.Pane = function (title) {
   this.$dom = $('<section/>', {'class': 'pane'});
   this.$dom.css({position: 'absolute', left: '100%', right: 0, top: 0, bottom: 0, 'overflow-x': 'hidden'});
   
-  this.title = title;
   this.$title = $('<h3/>', {text: title}).appendTo(this.$dom);
-  
   this.$inner = $('<div/>').appendTo(this.$dom);
   //this.$inner.css({width: 600, 'overflow-x': 'hidden'});
 };
 
 $.PaneView.Pane.prototype.text = function (text) {
   this.$inner.text(text);
+};
+
+$.PaneView.Pane.prototype.title = function (title) {
+  this.$title.text(title);
+};
+
+$.PaneView.Pane.prototype.dom = function (dom) {
+  this.$inner.empty()
+  this.$inner.append(dom);
 };
 
 
@@ -144,8 +151,8 @@ $.PaneView.NavPane = function (title) {
   });
 };
 
-$.PaneView.NavPane.prototype.add = function (item, target) {
-  var $a  = $('<a/>', {text: item, href: target});
-  var $li = $('<li/>').append($a).appendTo(this.$ul);
+$.PaneView.NavPane.prototype.add = function (item, target, extra) {
+  var $a  = $('<a/>', {text: item, href: target, });
+  var $li = $('<li/>', {'class': extra}).append($a).appendTo(this.$ul);
 };
 
