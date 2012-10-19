@@ -145,7 +145,7 @@
           $dom.append($('<p/\>', {text: 'Term: ' + item.termname}));
           $dom.append($('<p/\>', {text: 'College: ' + item.collegename}));
           $dom.append($('<p/\>', {text: 'Comments: ' + item.comments}));
-          $dom.append($('<p/\>', {html: item.description.split('\r\n').join('<br/>')}));
+          $dom.append($('<p/\>', {html: item.description.split('\r\n').join('<br/\>')}));
           
           pane.dom($dom);
         });
@@ -166,6 +166,16 @@
 
         $.subjects = {};
         $.getJSON('http://abettertms.com/api/subjects', function (data) {
+          var compare = function (a, b) {
+            if (a.subjectcode < b.subjectcode)
+              return -1;
+            else if (a.subjectcode == b.subjectcode)
+              return 0;
+            else
+              return 1;
+          };
+          data.subjects.subject.sort(compare);
+          
           $.each(data.subjects.subject, function (i, subject) {
             $.subjects[subject.subjectcode] = subject.subjectname;
           });
